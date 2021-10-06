@@ -1,70 +1,121 @@
 #include <sourcemod>
+#include <sdktools>
+#include <sdkhooks>
+#include <regex>
+#include <zombiereloaded>
 
-/*
-thx to Infinite Ammo by twistedeuphoria - http://forums.alliedmods.net/showthread.php?t=55381
-*/
+#pragma semicolon 1
+#pragma newdecls required
 
-public Plugin:myinfo = {
-	name = "Ammo Script for Zombie:Reloaded",
-	author = "[SG-10]Cpt.Moore, Richard Helgeby, Kyle Sanderson",
-	description = "Sets 200 bullets to the active weapon at a certain interval.",
-	version = "2.1",
+// Handle CTrie;
+// int CTeamColors[1][3];
+// bool infiniteammo[MAXPLAYERS+1];
+
+bool CSkipList[MAXPLAYERS+1] = { false, ... };
+
+int activeOffset = -1;
+
+int clip1Offset = -1;
+int clip2Offset = -1;
+int secAmmoTypeOffset = -1;
+int priAmmoTypeOffset = -1;
+
+char sWeapon[32];
+
+public Plugin myinfo =
+{
+	name = "[ZR] Infinite Ammo",
+	author = "[SG-10]Cpt.Moore, Richard Helgeby, Kyle Sanderson, Franc1sco franug, Doshik",
+	description = "Sets 200 bullets to the active weapon at a certain interval",
+	version = "2.5",
 	url = "http://jupiter.swissquake.ch/zombie/page"
 };
 
-new activeOffset = -1;
-new clip1Offset = -1;
-new clip2Offset = -1;
-new secAmmoTypeOffset = -1;
-new priAmmoTypeOffset = -1;
-
-//new Handle:hTimer;
-new Handle:cvarInterval;
-new Handle:AmmoTimer;
-
-public OnPluginStart()
+public void OnPluginStart()
 {
-	cvarInterval = CreateConVar("zr_ammo_interval", "5", "How often to reset ammo (in seconds).", _, true, 1.0);
-	AutoExecConfig(true, "plugin.zr_ammo");
+	HookEvent("player_connect_client", Event_PlayerConnect, EventHookMode_Post);
+	HookEvent("player_spawn", Event_PlayerSpawn, EventHookMode_Post);
+	HookEvent("weapon_fire", EventWeaponFire, EventHookMode_Post);
+	HookEvent("player_death", Event_PlayerDeath, EventHookMode_Post);
+	HookEvent("player_disconnect", Event_PlayerDisconnect, EventHookMode_Pre);
 
-	activeOffset = FindSendPropOffs("CAI_BaseNPC", "m_hActiveWeapon");
-	
-	clip1Offset = FindSendPropOffs("CBaseCombatWeapon", "m_iClip1");
-	clip2Offset = FindSendPropOffs("CBaseCombatWeapon", "m_iClip2");
-	
-	priAmmoTypeOffset = FindSendPropOffs("CBaseCombatWeapon", "m_iPrimaryAmmoCount");
-	secAmmoTypeOffset = FindSendPropOffs("CBaseCombatWeapon", "m_iSecondaryAmmoCount");
+	activeOffset = FindSendPropInfo("CAI_BaseNPC", "m_hActiveWeapon");
+	clip1Offset = FindSendPropInfo("CBaseCombatWeapon", "m_iClip1");
+	clip2Offset = FindSendPropInfo("CBaseCombatWeapon", "m_iClip2");
+	priAmmoTypeOffset = FindSendPropInfo("CBaseCombatWeapon", "m_iPrimaryAmmoCount");
+	secAmmoTypeOffset = FindSendPropInfo("CBaseCombatWeapon", "m_iSecondaryAmmoCount");
 }
 
-public OnConfigsExecuted()
+public void Event_PlayerSpawn(Event event, const char[] name, bool dontBroadcast)
 {
-	if (AmmoTimer != INVALID_HANDLE) {
-		KillTimer(AmmoTimer);
-	}
-	new Float:interval = GetConVarFloat(cvarInterval);
-	AmmoTimer = CreateTimer(interval, ResetAmmo, _, TIMER_REPEAT);
-}
-
-public Action:ResetAmmo(Handle:timer)
-{
-	for (new client = 1; client <= MaxClients; client++)
+	int client = GetClientOfUserId(GetEventInt(event, "userid", 0));
+	if (client > 0 && IsClientInGame(client) && IsPlayerAlive(client))
 	{
-		if (IsClientConnected(client) && !IsFakeClient(client) && IsClientInGame(client) && IsPlayerAlive(client))
-		{
-			Client_ResetAmmo(client);
-		}
+		CSkipList[client] = false;
 	}
 }
 
-public Client_ResetAmmo(client)
+public Action EventWeaponFire(Event event, const char[] name, bool dontBroadcast)
 {
-	new zomg = GetEntDataEnt2(client, activeOffset);
+	int client = GetClientOfUserId(GetEventInt(event, "userid"));
+	if (IsFakeClient(client) || ZR_IsClientZombie(client))
+	{
+		CSkipList[client] = false;
+	}
+	else
+	{
+		GetClientWeapon(client, sWeapon, 32);
+		if (StrContains(sWeapon, "knife", true) != -1)
+		{
+			CSkipList[client] = false;
+		}
+		CSkipList[client] = true;
+	}
+	if (CSkipList[client])
+	{
+		Client_ResetAmmo(client);
+	}
+	return Plugin_Continue;
+}
+
+public Action Event_PlayerConnect(Event event, const char[] name, bool dontBroadcast)
+{
+	int client = GetClientOfUserId(GetEventInt(event, "userid"));
+	CSkipList[client] = false;
+	return Plugin_Continue;
+}
+
+public Action Event_PlayerDisconnect(Event event, const char[] name, bool dontBroadcast)
+{
+	int client = GetClientOfUserId(GetEventInt(event, "userid"));
+	CSkipList[client] = false;
+	return Plugin_Continue;
+}
+
+public Action Event_PlayerDeath(Event event, const char[] name, bool dontBroadcast)
+{
+	int client = GetClientOfUserId(GetEventInt(event, "userid"));
+	CSkipList[client] = false;
+	return Plugin_Continue;
+}
+
+stock void Client_ResetAmmo(int client)
+{
+	int zomg = GetEntDataEnt2(client, activeOffset);
 	if (clip1Offset != -1 && zomg != -1)
-		SetEntData(zomg, clip1Offset, 200, 4, true);
+	{
+		SetEntData(zomg, clip1Offset, GetEntData(zomg, clip1Offset, 4) + 1, 4, true);
+	}
 	if (clip2Offset != -1 && zomg != -1)
-		SetEntData(zomg, clip2Offset, 200, 4, true);
+	{
+		SetEntData(zomg, clip2Offset, GetEntData(zomg, clip2Offset, 4) + 1, 4, true);
+	}
 	if (priAmmoTypeOffset != -1 && zomg != -1)
-		SetEntData(zomg, priAmmoTypeOffset, 200, 4, true);
+	{
+		SetEntData(zomg, priAmmoTypeOffset, GetEntData(zomg, priAmmoTypeOffset, 4) + 1, 4, true);
+	}
 	if (secAmmoTypeOffset != -1 && zomg != -1)
-		SetEntData(zomg, secAmmoTypeOffset, 200, 4, true);
+	{
+		SetEntData(zomg, secAmmoTypeOffset, GetEntData(zomg, secAmmoTypeOffset, 4) + 1, 4, true);
+	}
 }
