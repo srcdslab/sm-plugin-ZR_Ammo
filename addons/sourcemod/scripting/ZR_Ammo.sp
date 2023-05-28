@@ -1,121 +1,125 @@
+// Original plugin by : [SG-10]Cpt.Moore, Richard Helgeby, Kyle Sanderson, Franc1sco franug, Doshik
+// Fully rebuild with code clean up, and second semi-automatic mod of glock & famas fixed
+
 #include <sourcemod>
 #include <sdktools>
 #include <sdkhooks>
-#include <regex>
 #include <zombiereloaded>
+#include <multicolors>
 
 #pragma semicolon 1
 #pragma newdecls required
 
-// Handle CTrie;
-// int CTeamColors[1][3];
-// bool infiniteammo[MAXPLAYERS+1];
+bool g_bInfAmmo[MAXPLAYERS + 1] = { false, ... };
+bool g_bInfAmmoEnabled = true;
 
-bool CSkipList[MAXPLAYERS+1] = { false, ... };
-
-int activeOffset = -1;
-
-int clip1Offset = -1;
-int clip2Offset = -1;
-int secAmmoTypeOffset = -1;
-int priAmmoTypeOffset = -1;
-
-char sWeapon[32];
-
-public Plugin myinfo =
-{
+public Plugin myinfo = {
 	name = "[ZR] Infinite Ammo",
-	author = "[SG-10]Cpt.Moore, Richard Helgeby, Kyle Sanderson, Franc1sco franug, Doshik",
-	description = "Sets 200 bullets to the active weapon at a certain interval",
-	version = "2.5",
-	url = "http://jupiter.swissquake.ch/zombie/page"
+	author = "BotoX + Obus + maxime1907, .Rushaway",
+	description = "Give infinite ammo",
+	version = "3.0",
+	url = ""
 };
 
-public void OnPluginStart()
-{
-	HookEvent("player_connect_client", Event_PlayerConnect, EventHookMode_Post);
-	HookEvent("player_spawn", Event_PlayerSpawn, EventHookMode_Post);
-	HookEvent("weapon_fire", EventWeaponFire, EventHookMode_Post);
+public void OnPluginStart() {
+	RegAdminCmd("sm_infammo", Command_InfAmmo, ADMFLAG_CONFIG, "sm_infammo <value>");
+
+	HookEvent("weapon_fire", Event_WeaponFire, EventHookMode_Post);
 	HookEvent("player_death", Event_PlayerDeath, EventHookMode_Post);
-	HookEvent("player_disconnect", Event_PlayerDisconnect, EventHookMode_Pre);
-
-	activeOffset = FindSendPropInfo("CAI_BaseNPC", "m_hActiveWeapon");
-	clip1Offset = FindSendPropInfo("CBaseCombatWeapon", "m_iClip1");
-	clip2Offset = FindSendPropInfo("CBaseCombatWeapon", "m_iClip2");
-	priAmmoTypeOffset = FindSendPropInfo("CBaseCombatWeapon", "m_iPrimaryAmmoCount");
-	secAmmoTypeOffset = FindSendPropInfo("CBaseCombatWeapon", "m_iSecondaryAmmoCount");
+	HookEvent("player_spawn", Event_PlayerSpawn, EventHookMode_Post);
 }
 
-public void Event_PlayerSpawn(Event event, const char[] name, bool dontBroadcast)
-{
+public void OnClientPutInServer(int client) {
+	g_bInfAmmo[client] = false;
+}
+
+public void OnClientDisconnect(int client) {
+	g_bInfAmmo[client] = false;
+}
+
+public void Event_PlayerSpawn(Event event, const char[] name, bool dontBroadcast) {
 	int client = GetClientOfUserId(GetEventInt(event, "userid", 0));
+
 	if (client > 0 && IsClientInGame(client) && IsPlayerAlive(client))
-	{
-		CSkipList[client] = false;
-	}
+		g_bInfAmmo[client] = true;
 }
 
-public Action EventWeaponFire(Event event, const char[] name, bool dontBroadcast)
-{
+public Action Event_PlayerDeath(Event event, const char[] name, bool dontBroadcast) {
 	int client = GetClientOfUserId(GetEventInt(event, "userid"));
-	if (IsFakeClient(client) || ZR_IsClientZombie(client))
-	{
-		CSkipList[client] = false;
+
+	g_bInfAmmo[client] = false;
+	return Plugin_Continue;
+}
+
+public Action Command_InfAmmo(int client, int argc) {
+	if (argc < 1) {
+		CReplyToCommand(client, "{green}[SM] {default}Usage: sm_infammo {olive}<value>");
+		return Plugin_Handled;
 	}
+
+	char sArgs[2];
+	int value = -1;
+	bool bValue;
+
+	GetCmdArg(1, sArgs, sizeof(sArgs));
+
+	bValue = sArgs[0] == '1' ? true : false;
+
+	if (StringToIntEx(sArgs, value) == 0) {
+		CReplyToCommand(client, "{green}[SM]{default} Invalid Value.");
+		return Plugin_Handled;
+	}
+
+	if (bValue)
+		g_bInfAmmoEnabled = true;
 	else
-	{
-		GetClientWeapon(client, sWeapon, 32);
-		if (StrContains(sWeapon, "knife", true) != -1)
-		{
-			CSkipList[client] = false;
+		g_bInfAmmoEnabled = false;
+
+	CReplyToCommand(client, "{green}[SM] {default}Succesfully %s {default}Infinite Ammo for the map.", g_bInfAmmoEnabled ? "{green}Enabled" : "{red}Disabled");
+	CShowActivity2(client, "{green}[SM] {olive}", "%s {default}Infinite Ammo for the map.", g_bInfAmmoEnabled ? "{green}Enabled" : "{red}Disabled");
+	LogAction(client, -1, "\"%L\" %s Infinite Ammo for the map.", client, g_bInfAmmoEnabled ? "Enabled" : "Disabled");
+
+	return Plugin_Handled;
+}
+
+public void Event_WeaponFire(Handle hEvent, char[] name, bool dontBroadcast) {
+	if (!g_bInfAmmoEnabled)
+		return;
+
+	int client = GetClientOfUserId(GetEventInt(hEvent, "userid"));
+
+	if (ZR_IsClientZombie(client) || !IsPlayerAlive(client))
+		return;
+
+	if (!g_bInfAmmo[client])
+		return;
+
+	int weapon = GetEntPropEnt(client, Prop_Data, "m_hActiveWeapon", 0);
+	if (IsValidEntity(weapon)) {
+		if (weapon == GetPlayerWeaponSlot(client, 0) || weapon == GetPlayerWeaponSlot(client, 1)) {
+			if (GetEntProp(weapon, Prop_Send, "m_iState", 4, 0) == 2 && GetEntProp(weapon, Prop_Send, "m_iClip1", 4, 0)) {
+				int  toAdd = 1;
+				char weaponClassname[128];
+				GetEntityClassname(weapon, weaponClassname, sizeof(weaponClassname));
+
+				if (StrEqual(weaponClassname, "weapon_glock", true) || StrEqual(weaponClassname, "weapon_famas", true)) {
+					if (GetEntProp(weapon, Prop_Send, "m_bBurstMode")) {
+						switch (GetEntProp(weapon, Prop_Send, "m_iClip1")) {
+							case 1: {
+								toAdd = 1;
+							} case 2: {
+								toAdd = 2;
+							} default: {
+								toAdd = 3;
+							}
+						}
+					}
+				}
+
+				SetEntProp(weapon, Prop_Send, "m_iClip1", GetEntProp(weapon, Prop_Send, "m_iClip1", 4, 0) + toAdd, 4, 0);
+			}
 		}
-		CSkipList[client] = true;
 	}
-	if (CSkipList[client])
-	{
-		Client_ResetAmmo(client);
-	}
-	return Plugin_Continue;
-}
 
-public Action Event_PlayerConnect(Event event, const char[] name, bool dontBroadcast)
-{
-	int client = GetClientOfUserId(GetEventInt(event, "userid"));
-	CSkipList[client] = false;
-	return Plugin_Continue;
-}
-
-public Action Event_PlayerDisconnect(Event event, const char[] name, bool dontBroadcast)
-{
-	int client = GetClientOfUserId(GetEventInt(event, "userid"));
-	CSkipList[client] = false;
-	return Plugin_Continue;
-}
-
-public Action Event_PlayerDeath(Event event, const char[] name, bool dontBroadcast)
-{
-	int client = GetClientOfUserId(GetEventInt(event, "userid"));
-	CSkipList[client] = false;
-	return Plugin_Continue;
-}
-
-stock void Client_ResetAmmo(int client)
-{
-	int zomg = GetEntDataEnt2(client, activeOffset);
-	if (clip1Offset != -1 && zomg != -1)
-	{
-		SetEntData(zomg, clip1Offset, GetEntData(zomg, clip1Offset, 4) + 1, 4, true);
-	}
-	if (clip2Offset != -1 && zomg != -1)
-	{
-		SetEntData(zomg, clip2Offset, GetEntData(zomg, clip2Offset, 4) + 1, 4, true);
-	}
-	if (priAmmoTypeOffset != -1 && zomg != -1)
-	{
-		SetEntData(zomg, priAmmoTypeOffset, GetEntData(zomg, priAmmoTypeOffset, 4) + 1, 4, true);
-	}
-	if (secAmmoTypeOffset != -1 && zomg != -1)
-	{
-		SetEntData(zomg, secAmmoTypeOffset, GetEntData(zomg, secAmmoTypeOffset, 4) + 1, 4, true);
-	}
+	return;
 }
