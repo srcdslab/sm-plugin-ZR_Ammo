@@ -13,6 +13,8 @@
 bool g_bInfAmmo[MAXPLAYERS + 1] = { false, ... };
 bool g_bInfAmmoEnabled = true;
 
+ConVar g_cvBots;
+
 public Plugin myinfo = {
 	name = "[ZR] Infinite Ammo",
 	author = "BotoX + Obus + maxime1907, .Rushaway",
@@ -22,7 +24,11 @@ public Plugin myinfo = {
 };
 
 public void OnPluginStart() {
+	g_cvBots = CreateConVar("sm_infammo_bots", "1", "Bots should have Infinite Ammo?", _, true, 0.0, true, 1.0);
+
 	RegAdminCmd("sm_infammo", Command_InfAmmo, ADMFLAG_CONFIG, "sm_infammo <value>");
+
+	AutoExecConfig(true);
 
 	HookEvent("weapon_fire", Event_WeaponFire, EventHookMode_Post);
 	HookEvent("player_death", Event_PlayerDeath, EventHookMode_Post);
@@ -40,7 +46,7 @@ public void OnClientDisconnect(int client) {
 public void Event_PlayerSpawn(Event event, const char[] name, bool dontBroadcast) {
 	int client = GetClientOfUserId(GetEventInt(event, "userid", 0));
 
-	if (client > 0 && IsClientInGame(client) && IsPlayerAlive(client))
+	if (IsValidClient(client, g_cvBots.BoolValue) && IsPlayerAlive(client))
 		g_bInfAmmo[client] = true;
 }
 
@@ -122,4 +128,11 @@ public void Event_WeaponFire(Handle hEvent, char[] name, bool dontBroadcast) {
 	}
 
 	return;
+}
+
+bool IsValidClient(int client, bool nobots = true) {
+	if (client <= 0 || client > MaxClients || !IsClientConnected(client) || (nobots && IsFakeClient(client)))
+		return false;
+
+	return IsClientInGame(client);
 }
