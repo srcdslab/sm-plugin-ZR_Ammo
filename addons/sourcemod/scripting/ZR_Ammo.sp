@@ -19,7 +19,7 @@ public Plugin myinfo = {
 	name = "[ZR] Infinite Ammo",
 	author = "BotoX + Obus + maxime1907, .Rushaway",
 	description = "Give infinite ammo",
-	version = "3.0",
+	version = "3.0.1",
 	url = ""
 };
 
