@@ -6,7 +6,6 @@ This repository contains a SourcePawn plugin for SourceMod that provides infinit
 ## Project Structure
 ```
 addons/sourcemod/scripting/ZR_Ammo.sp    # Main plugin source code
-sourceknight.yaml                        # Build configuration and dependencies
 .github/workflows/ci.yml                # CI/CD pipeline
 ```
 
@@ -14,29 +13,23 @@ sourceknight.yaml                        # Build configuration and dependencies
 
 ### Language & Platform
 - **Language**: SourcePawn
-- **Platform**: SourceMod 1.11+ (configured for 1.11.0-git6934)
-- **Build Tool**: sourceknight 0.2
-- **Compiler**: Latest SourcePawn compiler via sourceknight
+- **Platform**: SourceMod 1.12.x
+- **Build Tool**: native GitHub Actions (rumblefrog/setup-sp)
+- **Compiler**: spcomp via rumblefrog/setup-sp@v1.3.1
 
 ### Dependencies
-- **sourcemod**: Core SourceMod framework (1.11.0-git6934)
+- **sourcemod**: Core SourceMod framework (1.12.x)
 - **zombiereloaded**: ZR plugin for zombie/human game mechanics
 - **multicolors**: Enhanced chat color support
 
 ## Build System
 
 ### Building the Plugin
-```bash
-# Install sourceknight (if not available)
-# Build the plugin
-sourceknight build
-```
-
-The build system:
-- Uses `sourceknight.yaml` for configuration
-- Outputs compiled plugin to `/addons/sourcemod/plugins`
-- Automatically handles dependencies via the configuration
-- CI/CD runs on every push/PR using GitHub Actions
+The plugin is built automatically by the `.github/workflows/ci.yml` GitHub Actions workflow:
+- Fetches dependencies (zombiereloaded, multicolors) via `git clone`
+- Compiles `ZR_Ammo.sp` with `spcomp`
+- Outputs compiled plugin to `addons/sourcemod/plugins`
+- Runs on every push/PR, tags a `latest` release on pushes to master/main
 
 ### Testing
 - Test on a development server with SourceMod 1.11+
