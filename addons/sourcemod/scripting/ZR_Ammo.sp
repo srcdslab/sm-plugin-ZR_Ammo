@@ -19,7 +19,7 @@ public Plugin myinfo = {
 	name = "[ZR] Infinite Ammo",
 	author = "BotoX + Obus + maxime1907, .Rushaway",
 	description = "Give infinite ammo",
-	version = "3.0.1",
+	version = "3.0.2",
 	url = ""
 };
 
@@ -44,14 +44,14 @@ public void OnClientDisconnect(int client) {
 }
 
 public void Event_PlayerSpawn(Event event, const char[] name, bool dontBroadcast) {
-	int client = GetClientOfUserId(GetEventInt(event, "userid", 0));
+	int client = GetClientOfUserId(event.GetInt("userid", 0));
 
 	if (IsValidClient(client, g_cvBots.BoolValue) && IsPlayerAlive(client))
 		g_bInfAmmo[client] = true;
 }
 
 public Action Event_PlayerDeath(Event event, const char[] name, bool dontBroadcast) {
-	int client = GetClientOfUserId(GetEventInt(event, "userid"));
+	int client = GetClientOfUserId(event.GetInt("userid"));
 
 	g_bInfAmmo[client] = false;
 	return Plugin_Continue;
@@ -88,11 +88,11 @@ public Action Command_InfAmmo(int client, int argc) {
 	return Plugin_Handled;
 }
 
-public void Event_WeaponFire(Handle hEvent, char[] name, bool dontBroadcast) {
+public void Event_WeaponFire(Event hEvent, char[] name, bool dontBroadcast) {
 	if (!g_bInfAmmoEnabled)
 		return;
 
-	int client = GetClientOfUserId(GetEventInt(hEvent, "userid"));
+	int client = GetClientOfUserId(hEvent.GetInt("userid"));
 
 	if (ZR_IsClientZombie(client) || !IsPlayerAlive(client))
 		return;
