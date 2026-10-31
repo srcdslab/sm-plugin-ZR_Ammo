@@ -19,11 +19,13 @@ public Plugin myinfo = {
 	name = "[ZR] Infinite Ammo",
 	author = "BotoX + Obus + maxime1907, .Rushaway",
 	description = "Give infinite ammo",
-	version = "3.0.2",
+	version = "3.0.3",
 	url = ""
 };
 
 public void OnPluginStart() {
+	LoadTranslations("ZR_Ammo.phrases");
+
 	g_cvBots = CreateConVar("sm_infammo_bots", "1", "Bots should have Infinite Ammo?", _, true, 0.0, true, 1.0);
 
 	RegAdminCmd("sm_infammo", Command_InfAmmo, ADMFLAG_CONFIG, "sm_infammo <value>");
@@ -59,7 +61,7 @@ public Action Event_PlayerDeath(Event event, const char[] name, bool dontBroadca
 
 public Action Command_InfAmmo(int client, int argc) {
 	if (argc < 1) {
-		CReplyToCommand(client, "{green}[SM] {default}Usage: sm_infammo {olive}<value>");
+		CReplyToCommand(client, "{green}[SM] {default}%t", "InfAmmo Usage");
 		return Plugin_Handled;
 	}
 
@@ -72,7 +74,7 @@ public Action Command_InfAmmo(int client, int argc) {
 	bValue = sArgs[0] == '1' ? true : false;
 
 	if (StringToIntEx(sArgs, value) == 0) {
-		CReplyToCommand(client, "{green}[SM]{default} Invalid Value.");
+		CReplyToCommand(client, "{green}[SM]{default} %t", "InfAmmo Invalid Value");
 		return Plugin_Handled;
 	}
 
@@ -81,8 +83,8 @@ public Action Command_InfAmmo(int client, int argc) {
 	else
 		g_bInfAmmoEnabled = false;
 
-	CReplyToCommand(client, "{green}[SM] {default}Succesfully %s {default}Infinite Ammo for the map.", g_bInfAmmoEnabled ? "{green}Enabled" : "{red}Disabled");
-	CShowActivity2(client, "{green}[SM] {olive}", "%s {default}Infinite Ammo for the map.", g_bInfAmmoEnabled ? "{green}Enabled" : "{red}Disabled");
+	CReplyToCommand(client, "{green}[SM] {default}%t", g_bInfAmmoEnabled ? "InfAmmo Enabled Reply" : "InfAmmo Disabled Reply");
+	CShowActivity2(client, "{green}[SM] {olive}", "%t", g_bInfAmmoEnabled ? "InfAmmo Enabled Activity" : "InfAmmo Disabled Activity");
 	LogAction(client, -1, "\"%L\" %s Infinite Ammo for the map.", client, g_bInfAmmoEnabled ? "Enabled" : "Disabled");
 
 	return Plugin_Handled;
