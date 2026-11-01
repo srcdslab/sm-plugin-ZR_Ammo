@@ -1,0 +1,63 @@
+"Phrases"
+{
+	"InfAmmo Usage"
+	{
+		"en"		"Usage: sm_infammo {olive}<value>"
+		"fr"		"Utilisation : sm_infammo {olive}<value>"
+		"ru"		"Использование: sm_infammo {olive}<value>"
+		"es"		"Uso: sm_infammo {olive}<value>"
+		"de"		"Verwendung: sm_infammo {olive}<value>"
+		"pt"		"Uso: sm_infammo {olive}<value>"
+		"chi"		"用法：sm_infammo {olive}<value>"
+	}
+	"InfAmmo Invalid Value"
+	{
+		"en"		"Invalid value."
+		"fr"		"Valeur invalide."
+		"ru"		"Неверное значение."
+		"es"		"Valor no válido."
+		"de"		"Ungültiger Wert."
+		"pt"		"Valor inválido."
+		"chi"		"无效的数值。"
+	}
+	"InfAmmo Enabled Reply"
+	{
+		"en"		"Successfully {green}enabled {default}Infinite Ammo for the map."
+		"fr"		"Munitions infinies {green}activées {default}avec succès pour la map."
+		"ru"		"Бесконечные патроны успешно {green}включены {default}на эту карту."
+		"es"		"Munición infinita {green}activada {default}correctamente para el mapa."
+		"de"		"Unendliche Munition für die Map erfolgreich {green}aktiviert{default}."
+		"pt"		"Munição infinita {green}ativada {default}com sucesso para o mapa."
+		"chi"		"已成功为本地图{green}启用{default}无限弹药。"
+	}
+	"InfAmmo Disabled Reply"
+	{
+		"en"		"Successfully {red}disabled {default}Infinite Ammo for the map."
+		"fr"		"Munitions infinies {red}désactivées {default}avec succès pour la map."
+		"ru"		"Бесконечные патроны успешно {red}выключены {default}на эту карту."
+		"es"		"Munición infinita {red}desactivada {default}correctamente para el mapa."
+		"de"		"Unendliche Munition für die Map erfolgreich {red}deaktiviert{default}."
+		"pt"		"Munição infinita {red}desativada {default}com sucesso para o mapa."
+		"chi"		"已成功为本地图{red}禁用{default}无限弹药。"
+	}
+	"InfAmmo Enabled Activity"
+	{
+		"en"		"{green}Enabled {default}Infinite Ammo for the map."
+		"fr"		"Munitions infinies {green}activées {default}pour la map."
+		"ru"		"Бесконечные патроны {green}включены {default}на эту карту."
+		"es"		"Munición infinita {green}activada {default}para el mapa."
+		"de"		"Unendliche Munition für die Map {green}aktiviert{default}."
+		"pt"		"Munição infinita {green}ativada {default}para o mapa."
+		"chi"		"已为本地图{green}启用{default}无限弹药。"
+	}
+	"InfAmmo Disabled Activity"
+	{
+		"en"		"{red}Disabled {default}Infinite Ammo for the map."
+		"fr"		"Munitions infinies {red}désactivées {default}pour la map."
+		"ru"		"Бесконечные патроны {red}выключены {default}на эту карту."
+		"es"		"Munición infinita {red}desactivada {default}para el mapa."
+		"de"		"Unendliche Munition für die Map {red}deaktiviert{default}."
+		"pt"		"Munição infinita {red}desativada {default}para o mapa."
+		"chi"		"已为本地图{red}禁用{default}无限弹药。"
+	}
+}
