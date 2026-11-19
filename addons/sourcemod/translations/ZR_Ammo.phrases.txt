@@ -9,6 +9,12 @@
 		"de"		"Verwendung: sm_infammo {olive}<value>"
 		"pt"		"Uso: sm_infammo {olive}<value>"
 		"chi"		"用法：sm_infammo {olive}<value>"
+		"pl"		"Użycie: sm_infammo {olive}<value>"
+		"tr"		"Kullanım: sm_infammo {olive}<value>"
+		"it"		"Utilizzo: sm_infammo {olive}<value>"
+		"ua"		"Використання: sm_infammo {olive}<value>"
+		"zho"		"用法：sm_infammo {olive}<value>"
+		"cze"		"Použití: sm_infammo {olive}<value>"
 	}
 	"InfAmmo Invalid Value"
 	{
@@ -19,6 +25,12 @@
 		"de"		"Ungültiger Wert."
 		"pt"		"Valor inválido."
 		"chi"		"无效的数值。"
+		"pl"		"Nieprawidłowa wartość."
+		"tr"		"Geçersiz değer."
+		"it"		"Valore non valido."
+		"ua"		"Недійсне значення."
+		"zho"		"無效的數值。"
+		"cze"		"Neplatná hodnota."
 	}
 	"InfAmmo Enabled Reply"
 	{
@@ -29,6 +41,12 @@
 		"de"		"Unendliche Munition für die Map erfolgreich {green}aktiviert{default}."
 		"pt"		"Munição infinita {green}ativada {default}com sucesso para o mapa."
 		"chi"		"已成功为本地图{green}启用{default}无限弹药。"
+		"pl"		"Pomyślnie {green}włączono {default}nieskończoną amunicję na tej mapie."
+		"tr"		"Harita için sonsuz mermi başarıyla {green}etkinleştirildi{default}."
+		"it"		"Munizioni infinite {green}attivate {default}con successo per la mappa."
+		"ua"		"Нескінченні патрони успішно {green}увімкнено {default}для цієї мапи."
+		"zho"		"已成功在本地圖{green}啟用{default}無限彈藥。"
+		"cze"		"Nekonečná munice byla úspěšně {green}zapnuta {default}pro tuto mapu."
 	}
 	"InfAmmo Disabled Reply"
 	{
@@ -39,6 +57,12 @@
 		"de"		"Unendliche Munition für die Map erfolgreich {red}deaktiviert{default}."
 		"pt"		"Munição infinita {red}desativada {default}com sucesso para o mapa."
 		"chi"		"已成功为本地图{red}禁用{default}无限弹药。"
+		"pl"		"Pomyślnie {red}wyłączono {default}nieskończoną amunicję na tej mapie."
+		"tr"		"Harita için sonsuz mermi başarıyla {red}devre dışı bırakıldı{default}."
+		"it"		"Munizioni infinite {red}disattivate {default}con successo per la mappa."
+		"ua"		"Нескінченні патрони успішно {red}вимкнено {default}для цієї мапи."
+		"zho"		"已成功在本地圖{red}停用{default}無限彈藥。"
+		"cze"		"Nekonečná munice byla úspěšně {red}vypnuta {default}pro tuto mapu."
 	}
 	"InfAmmo Enabled Activity"
 	{
@@ -49,6 +73,12 @@
 		"de"		"Unendliche Munition für die Map {green}aktiviert{default}."
 		"pt"		"Munição infinita {green}ativada {default}para o mapa."
 		"chi"		"已为本地图{green}启用{default}无限弹药。"
+		"pl"		"{green}Włączono {default}nieskończoną amunicję na tej mapie."
+		"tr"		"Harita için sonsuz mermi {green}etkinleştirildi{default}."
+		"it"		"Munizioni infinite {green}attivate {default}per la mappa."
+		"ua"		"Нескінченні патрони {green}увімкнено {default}для цієї мапи."
+		"zho"		"已在本地圖{green}啟用{default}無限彈藥。"
+		"cze"		"Nekonečná munice {green}zapnuta {default}pro tuto mapu."
 	}
 	"InfAmmo Disabled Activity"
 	{
@@ -59,5 +89,11 @@
 		"de"		"Unendliche Munition für die Map {red}deaktiviert{default}."
 		"pt"		"Munição infinita {red}desativada {default}para o mapa."
 		"chi"		"已为本地图{red}禁用{default}无限弹药。"
+		"pl"		"{red}Wyłączono {default}nieskończoną amunicję na tej mapie."
+		"tr"		"Harita için sonsuz mermi {red}devre dışı bırakıldı{default}."
+		"it"		"Munizioni infinite {red}disattivate {default}per la mappa."
+		"ua"		"Нескінченні патрони {red}вимкнено {default}для цієї мапи."
+		"zho"		"已在本地圖{red}停用{default}無限彈藥。"
+		"cze"		"Nekonečná munice {red}vypnuta {default}pro tuto mapu."
 	}
 }
